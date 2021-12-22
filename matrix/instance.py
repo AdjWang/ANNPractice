@@ -135,24 +135,39 @@ class Matrix:
         Verifier.instance(matrix)
         Verifier.identical_shape(self, matrix)
 
+        new_data = list(map(list, self.__data)) # make a copy
         # point wise add
         for r in range(self.__row):
             for c in range(self.__column):
-                self.__data[r][c] += matrix.__data[r][c]
+                new_data[r][c] += matrix.__data[r][c]
 
-        return self
+        return Matrix(new_data)
 
     def __sub__(self, matrix: Matrix) -> Matrix:
         # verify
         Verifier.instance(matrix)
         Verifier.identical_shape(self, matrix)
 
+        new_data = list(map(list, self.__data)) # make a copy
         # point wise substract
         for r in range(self.__row):
             for c in range(self.__column):
-                self.__data[r][c] -= matrix.__data[r][c]
+                new_data[r][c] -= matrix.__data[r][c]
 
-        return self
+        return Matrix(new_data)
+
+    def __mul__(self, matrix: Matrix) -> Matrix:
+        # verify
+        Verifier.instance(matrix)
+        Verifier.identical_shape(self, matrix)
+
+        new_data = list(map(list, self.__data)) # make a copy
+        # point wise substract
+        for r in range(self.__row):
+            for c in range(self.__column):
+                new_data[r][c] *= matrix.__data[r][c]
+
+        return Matrix(new_data)
 
     def rows(self) -> List[float]:
         for r in self.__data:
@@ -171,10 +186,11 @@ class Matrix:
 
     def apply(self, operate: function) -> Matrix:
         row, column = self.shape
+        new_data = list(map(list, self.__data)) # make a copy
         for r in range(row):
             for c in range(column):
-                self.__data[r][c] = operate(self.__data[r][c])
-        return self
+                new_data[r][c] = operate(self.__data[r][c])
+        return Matrix(new_data)
 
     @staticmethod
     def dot(mat1: Matrix, mat2: Matrix) -> Matrix:

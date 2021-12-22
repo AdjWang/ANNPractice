@@ -1,5 +1,6 @@
 from typing import List
-from math import pow, e
+from math import pow, e, log
+
 from matrix import Matrix
 
 def gradient_descent(W: Matrix, diff_W: Matrix, learning_rate: float) -> Matrix:
@@ -19,3 +20,6 @@ def onehot(type_num: int) -> List[List[int]]:
     for i in range(type_num):
         result[i][i] = 1
     return result
+
+def cross_entropy_loss(y: Matrix, t: Matrix)-> float:
+    return -(y.apply(log) * t).sum()

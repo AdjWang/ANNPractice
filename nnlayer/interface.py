@@ -12,7 +12,7 @@ class Input(NNFunction):
         return x
 
     def backward(self, y):
-        pass
+        return y
 
 
 class Output(NNFunction):
@@ -21,8 +21,13 @@ class Output(NNFunction):
 
     def forward(self, x: Matrix) -> Matrix:
         assert x.shape == (self.input_channel, 1)
-        return softmax(x)
+        # return softmax(x)
+        return x
 
     def backward(self, y: Matrix) -> Matrix:
-        assert y.shape[1] == self.input_channel
+        """
+        Args:
+            yt: ground truth
+        """
+        assert y.shape == (self.input_channel, 1)
         return y

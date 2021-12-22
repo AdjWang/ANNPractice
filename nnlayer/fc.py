@@ -35,6 +35,7 @@ class FullConnection(NNFunction):
         """
         assert x.shape[1] == 1
         y = Matrix.dot(self.W, x) + self.b
+        # y = Matrix.dot(self.W, x)
         assert y.shape[1] == 1
 
         # cache states at current stage
@@ -45,23 +46,21 @@ class FullConnection(NNFunction):
         """ backward inference
 
         Args:
-            y: input partial derivative, of {<dim_final_y>*output_channel}
+            y: input partial derivative, of {output_channel*1}
                dimention matrix
         Return:
-            x: output partial derivative, of {<dim_final_y>*input_channel}
+            x: output partial derivative, of {output_channel*1}
                dimention matrix
         """
-        J_W = Matrix.by_list([self.x.T[0].copy()
-                             for _ in range(self.output_channel)])
-        assert J_W.shape == (self.output_channel, self.input_channel)
-        J_b = Matrix.by_const(self.output_channel, 1, 1.0)
-        # y should be a diag matrix, where diag elemetns represent the diff
-        # from yi.
-        assert y.shape == (self.output_channel, self.output_channel)
+        assert y.shape == (self.output_channel, 1)
+        J_W = self.x.T
+        assert J_W.shape == (1, self.input_channel)
         diff_W = Matrix.dot(y, J_W)
-        diff_b = Matrix.dot(y, J_b)
+        diff_b = y
+        # err
+        err = Matrix.dot(self.W.T, y)
         # update parameters
         self.W = gradient_descent(self.W, diff_W, self.learning_rate)
         self.b = gradient_descent(self.b, diff_b, self.learning_rate)
         # transfer derivative
-        return Matrix.dot(y, self.W)
+        return err
