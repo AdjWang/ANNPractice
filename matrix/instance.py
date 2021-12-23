@@ -135,7 +135,7 @@ class Matrix:
         Verifier.instance(matrix)
         Verifier.identical_shape(self, matrix)
 
-        new_data = list(map(list, self.__data)) # make a copy
+        new_data = list(map(list, self.__data))  # make a copy
         # point wise add
         for r in range(self.__row):
             for c in range(self.__column):
@@ -148,7 +148,7 @@ class Matrix:
         Verifier.instance(matrix)
         Verifier.identical_shape(self, matrix)
 
-        new_data = list(map(list, self.__data)) # make a copy
+        new_data = list(map(list, self.__data))  # make a copy
         # point wise substract
         for r in range(self.__row):
             for c in range(self.__column):
@@ -161,7 +161,7 @@ class Matrix:
         Verifier.instance(matrix)
         Verifier.identical_shape(self, matrix)
 
-        new_data = list(map(list, self.__data)) # make a copy
+        new_data = list(map(list, self.__data))  # make a copy
         # point wise substract
         for r in range(self.__row):
             for c in range(self.__column):
@@ -186,7 +186,7 @@ class Matrix:
 
     def apply(self, operate: function) -> Matrix:
         row, column = self.shape
-        new_data = list(map(list, self.__data)) # make a copy
+        new_data = list(map(list, self.__data))  # make a copy
         for r in range(row):
             for c in range(column):
                 new_data[r][c] = operate(self.__data[r][c])

@@ -2,6 +2,7 @@
 from .basic import NNFunction
 from matrix import Matrix
 
+
 class ReLU(NNFunction):
     def __init__(self, input_channel: int):
         self.input_channel = input_channel
