@@ -28,7 +28,6 @@ def train(layers, datas, iter_num=1000):
             # loss
             loss += ((predict - ground_truth)*(predict - ground_truth)).sum()
             # diff of loss
-            # diff_loss = ground_truth - predict
             diff_loss = predict - ground_truth
             backward(layers, diff_loss)
 
