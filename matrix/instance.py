@@ -184,6 +184,11 @@ class Matrix:
                 summary += key(num)
         return summary
 
+    def __iter__(self) -> float:
+        for row in self.rows():
+            for num in row:
+                yield num
+
     def apply(self, operate: function) -> Matrix:
         row, column = self.shape
         new_data = list(map(list, self.__data))  # make a copy

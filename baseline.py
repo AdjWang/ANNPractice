@@ -1,7 +1,5 @@
-from matplotlib import pyplot as plt
-
 from matrix import Matrix
-from nnlayer import FullConnection, Input, Output, ReLU, onehot, Sigmoid
+from nnlayer import FullConnection, onehot, Sigmoid
 
 
 def forward(layers, x):
@@ -34,15 +32,14 @@ def train(layers, datas, iter_num=1000):
         loss_list.append(loss/len(datas))
         print('loss: ', loss/len(datas))
 
-    plt.plot(loss_list)
-    plt.show()
+    return loss_list
 
 
 if __name__ == '__main__':
-    layers = [Input(1),
-              FullConnection(1, 2, 0.35), Sigmoid(2),
-              FullConnection(2, 2, 0.35), Sigmoid(2),
-              Output(2)]
+    layers = [
+        FullConnection(1, 2, 0.35), Sigmoid(2),
+        FullConnection(2, 2, 0.35), Sigmoid(2),
+    ]
     ground_truth = onehot(2)
     datas = [
         ([0.1], ground_truth[0]),
@@ -50,4 +47,11 @@ if __name__ == '__main__':
         ([0.8], ground_truth[1]),
         ([0.9], ground_truth[1]),
     ]
-    train(layers, datas, 400)
+    loss_list = train(layers, datas, 400)
+
+    try:
+        from matplotlib import pyplot as plt
+        plt.plot(loss_list)
+        plt.show()
+    except Exception as e:
+        print(f'failed to draw graph due to: {e}')

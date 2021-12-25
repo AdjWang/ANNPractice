@@ -4,6 +4,8 @@ from .algorithms import gradient_descent, softmax
 from matrix import Matrix
 from random import random
 
+def rand_param():
+    return random() - 0.5
 
 class FullConnection(NNFunction):
     def __init__(self, input_channel: int, output_channel: int, learning_rate: float):
@@ -19,8 +21,8 @@ class FullConnection(NNFunction):
         # cache
         self.x = None
         # internal parameters
-        self.W = Matrix.by_generator(output_channel, input_channel, random)
-        self.b = Matrix.by_generator(output_channel, 1, random)
+        self.W = Matrix.by_generator(output_channel, input_channel, rand_param)
+        self.b = Matrix.by_generator(output_channel, 1, rand_param)
 
     def __repr__(self) -> str:
         return "Ti: " + str(self.input_channel)

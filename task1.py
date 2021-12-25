@@ -2,27 +2,19 @@ from math import sin, cos, pi
 from functools import partial
 
 from matrix import Matrix
-from nnlayer import FullConnection, Input, Output, ReLU, onehot, Sigmoid
+from nnlayer import FullConnection, Model, Sigmoid, LinearMapper
 
 
-def forward(layers, x):
-    for layer in layers:
-        x = layer.forward(x)
-    return x
-
-
-def backward(layers, x):
-    for layer in reversed(layers):
-        x = layer.backward(x)
-    return x
-
-
-def train(layers, datas, iter_num=1000):
+def train(model: Model, x, y, iter_num=100):
+    assert len(x) == len(y)
+    training_data = list(zip(x, y))
     loss_list = []
+    predict_list = []
     for i in range(1, iter_num+1):
         loss = 0.0
-        for data, ground_truth in datas:
-            predict = forward(layers, Matrix.by_list([data]).T)
+        for x, ground_truth in training_data:
+            predict = model.forward(Matrix.by_list([x]).T)
+            predict_list.append(predict)
             # print(predict)
             ground_truth = Matrix.by_list([ground_truth]).T
             # loss
@@ -30,48 +22,68 @@ def train(layers, datas, iter_num=1000):
                          (predict - ground_truth)).sum()
             loss += step_loss
             # diff of loss
-            # diff_loss = ground_truth - predict
             diff_loss = predict - ground_truth
-            backward(layers, diff_loss)
+            model.backward(diff_loss)
 
-        loss_list.append(loss/len(datas))
-        print(f'\riter: {i}, loss: {loss/len(datas)}', end='')
+        loss_list.append(loss/len(training_data))
+        print(f'\riter: {i}, loss: {loss/len(training_data)}', end='')
     print('')
-    return loss_list
+    return loss_list, predict_list
+
+
+def predict(model, x):
+    return model.forward(Matrix.by_list([x]).T).T[0]
 
 
 def target_func(x, a, b, c, d):
-    assert -pi <= x <= pi
     return a*cos(b*x)+c*sin(d*x)
 
 
-def generate_train_data(target_func, x_start, x_stop, points):
-    step = (x_stop - x_start) / points
-    datas = []
-    for i in range(points):
-        x = x_start + i * step
-        datas.append(([x], [target_func(x)]))
-    return datas
+def generate_x(start, stop, points):
+    step = (stop - start) / points
+    return [start + i * step for i in range(points)]
+
+
+def generate_y(target_func, x_list):
+    return [target_func(x) for x in x_list]
 
 
 if __name__ == '__main__':
-    points = 100
-    batch_size = 1
-    io_size = batch_size
-    hidden_size = 10
-    learning_rate = 0.3
-    layers = [Input(batch_size),
-              FullConnection(batch_size, hidden_size,
-                             learning_rate), Sigmoid(hidden_size),
-              FullConnection(hidden_size, hidden_size,
-                             learning_rate), Sigmoid(hidden_size),
-              FullConnection(hidden_size, hidden_size,
-                             learning_rate), Sigmoid(hidden_size),
-              FullConnection(hidden_size, batch_size,
-                             learning_rate), Sigmoid(batch_size),
-              Output(batch_size)]
-    ground_truth_generator = partial(target_func, a=1, b=1, c=1, d=1)
-    datas = generate_train_data(ground_truth_generator, -pi, pi, points=points)
-    # print(datas)
-    loss = train(layers, datas, 100)
-    print(loss)
+    # config
+    points = 50
+    x_range = (-pi, pi)  # [-pi, pi)
+    a, b, c, d = 1, 1, 1, 1 # a*cos(b*x)+c*sin(d*x)
+    iter_num = 100
+    learning_rate = 0.6
+
+    # initialize model
+    node_num = points
+    model = Model([FullConnection(node_num, node_num, learning_rate),
+                   Sigmoid(node_num),
+                   FullConnection(node_num, node_num, learning_rate),
+                   Sigmoid(node_num),
+                   ])
+    # generate training data
+    x = generate_x(x_range[0], x_range[1], points)
+    y = generate_y(partial(target_func, a=a, b=b, c=c, d=d), x)
+    data_mapper = LinearMapper()
+    mapped_y = data_mapper.mapping(y)
+    # train
+    loss, _ = train(model, [x], [mapped_y], iter_num)
+    # predict
+    predict_y = predict(model, x)
+    revmapped_y = data_mapper.revmapping(predict_y)
+
+    try:
+        from matplotlib import pyplot as plt
+        plt.figure(1)
+        ax1 = plt.subplot(121)
+        ax1.plot(loss)
+        ax1.set_title('loss')
+
+        ax2 = plt.subplot(122)
+        ax2.plot(y, '-', revmapped_y, '+')
+        ax2.set_title('curve')
+        plt.show()
+    except Exception as e:
+        print(f'failed to draw graph due to: {e}')
