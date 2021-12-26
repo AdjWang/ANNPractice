@@ -88,9 +88,6 @@ if __name__ == '__main__':
     iter_num = 10
     learning_rate = 0.3
 
-    # initialize model
-    model = Model.new_model(input_nodes, output_nodes, [28*28], learning_rate)
-
     # load data
     print('verify dataset')
     MINST.verify(dataset_path)
@@ -106,7 +103,7 @@ if __name__ == '__main__':
         path.join(dataset_path, 't10k-labels-idx1-ubyte.gz'))
 
     # generate training data
-    vec_labels = onehot(10)
+    vec_labels = onehot(output_nodes)
 
     train_images = [DataLoader.normalize_image(list(image))
                     for image in train_images]
@@ -115,9 +112,21 @@ if __name__ == '__main__':
     # DEBUG: shrink training set to be faster
     train_images, train_labels = train_images[:10], train_labels[:10]
 
+    # comment to only predict -------------------------------------------------
+    # initialize model
+    model = Model.new_model(input_nodes, output_nodes, [28*28], learning_rate)
+
     # train
     print('train')
     loss, _ = train(model, train_images, train_labels, iter_num)
+
+    # save model to file
+    model.dump('./model.dump')
+    del model
+    # -------------------------------------------------------------------------
+
+    # load model from file
+    model = Model.load('./model.dump')
 
     # predict
     image_index = randint(0, len(test_images)-1)

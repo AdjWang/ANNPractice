@@ -1,8 +1,8 @@
 from __future__ import annotations
 from typing import List
+import pickle
 
-from nnlayer.sigmoid import Sigmoid
-
+from .sigmoid import Sigmoid
 from .basic import NNFunction
 from .fc import FullConnection
 from matrix import Matrix
@@ -44,3 +44,13 @@ class Model(NNFunction):
         for layer in reversed(self.layers):
             y = layer.backward(y)
         return y
+
+    @staticmethod
+    def load(filepath: str) -> Model:
+        with open(filepath, 'rb') as f:
+            model = pickle.load(f)
+        return model
+
+    def dump(self, filepath: str) -> None:
+        with open(filepath, 'wb') as f:
+            pickle.dump(self, f)
