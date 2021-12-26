@@ -4,6 +4,10 @@ from math import pow, e, log
 from matrix import Matrix
 
 
+def argmax(p: List[float]) -> int:
+    return max(range(len(p)), key=lambda i: p[i])
+
+
 def gradient_descent(W: Matrix, diff_W: Matrix, learning_rate: float) -> Matrix:
     delta = Matrix.mul(diff_W, learning_rate)
     return W - delta
@@ -28,8 +32,10 @@ def onehot(type_num: int) -> List[List[int]]:
 def cross_entropy_loss(y: Matrix, t: Matrix) -> float:
     return -(y.apply(log) * t).sum()
 
+
 class LinearMapper:
     """ Map data to fit the range [0, 1] of sigmoid. """
+
     def __init__(self) -> None:
         self.alpha = 1.0
         self.bias = 0.0

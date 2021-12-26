@@ -4,8 +4,10 @@ from .algorithms import gradient_descent, softmax
 from matrix import Matrix
 from random import random
 
+
 def rand_param():
     return random() - 0.5
+
 
 class FullConnection(NNFunction):
     def __init__(self, input_channel: int, output_channel: int, learning_rate: float):

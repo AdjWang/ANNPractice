@@ -52,7 +52,7 @@ if __name__ == '__main__':
     # config
     points = 50
     x_range = (-pi, pi)  # [-pi, pi)
-    a, b, c, d = 1, 1, 1, 1 # a*cos(b*x)+c*sin(d*x)
+    a, b, c, d = 1, 1, 1, 1  # a*cos(b*x)+c*sin(d*x)
     iter_num = 100
     learning_rate = 0.6
 
