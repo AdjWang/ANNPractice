@@ -1,8 +1,11 @@
+from os import path
+import sys
 from math import sin, cos, pi, log
 import gzip
 from struct import unpack
 from random import randint
 
+from dataset import MINST
 from matrix import Matrix
 from nnlayer import FullConnection, Model, Sigmoid, softmax, argmax, onehot
 
@@ -78,6 +81,7 @@ def predict(model, x):
 
 if __name__ == '__main__':
     # config
+    dataset_path = path.join(path.dirname(sys.argv[0]), 'dataset')
     input_nodes = 28 * 28
     hidden_nodes = 28 * 28
     output_nodes = 10
@@ -88,15 +92,18 @@ if __name__ == '__main__':
     model = Model.new_model(input_nodes, output_nodes, [28*28], learning_rate)
 
     # load data
-    print('loading data...', end='')
+    print('verify dataset')
+    MINST.verify(dataset_path)
+
+    print('load data')
     train_images = DataLoader.load_train_image(
-        './MINST/train-images-idx3-ubyte.gz')
+        path.join(dataset_path, 'train-images-idx3-ubyte.gz'))
     test_images = DataLoader.load_test_image(
-        './MINST/t10k-images-idx3-ubyte.gz')
+        path.join(dataset_path, 't10k-images-idx3-ubyte.gz'))
     train_labels = DataLoader.load_train_label(
-        './MINST/train-labels-idx1-ubyte.gz')
+        path.join(dataset_path, 'train-labels-idx1-ubyte.gz'))
     test_labels = DataLoader.load_test_label(
-        './MINST/t10k-labels-idx1-ubyte.gz')
+        path.join(dataset_path, 't10k-labels-idx1-ubyte.gz'))
 
     # generate training data
     vec_labels = onehot(10)
@@ -107,7 +114,6 @@ if __name__ == '__main__':
     # assert len(train_images) == len(train_labels)
     # DEBUG: shrink training set to be faster
     train_images, train_labels = train_images[:10], train_labels[:10]
-    print('ok')
 
     # train
     print('train')
@@ -118,5 +124,5 @@ if __name__ == '__main__':
     predict_num = predict(model,
                           DataLoader.normalize_image(list(test_images[image_index])))
     label_num = test_labels[image_index]
-    print(
-        f'image.No: {image_index}, predict: {predict_num}, truth: {label_num}')
+    print(f'image.No: {image_index},\
+          predict: {predict_num}, truth: {label_num}')
