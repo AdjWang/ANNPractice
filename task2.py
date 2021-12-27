@@ -116,7 +116,7 @@ def validate(model: Model, x, y):
     return loss/len(validate_data)
 
 
-def train(model: Model, train_x, train_y, validate_x, validate_y, iter_num=100):
+def train(model: Model, train_x, train_y, validate_x, validate_y, iter_num=100, output='./'):
     loss_list = []
     for i in range(1, iter_num+1):
         # train
@@ -125,6 +125,7 @@ def train(model: Model, train_x, train_y, validate_x, validate_y, iter_num=100):
         loss = validate_loss
         loss_list.append(loss)
         print(f'iter: {i}, loss: {loss}')
+        model.dump(path.join(output, f'model_iter{i}_loss{loss:.4f}.dump'))
     return loss_list
 
 
@@ -177,8 +178,8 @@ if __name__ == '__main__':
     # train
     print('train')
     loss_list = train(model, train_images, train_labels,
-                      validate_images, validate_labels, iter_num)
-
+                      validate_images, validate_labels, iter_num, './out')
+    print(loss_list)
     # save model to file
     model.dump('./model.dump')
     del model

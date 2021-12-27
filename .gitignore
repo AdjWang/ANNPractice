@@ -4,3 +4,4 @@
 dataset/*
 !dataset/*.py
 *.dump
+out/
