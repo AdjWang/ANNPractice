@@ -1,5 +1,5 @@
 """ Matrix implementation.
-Just a naieve version :)
+Just a naive version :)
 """
 from __future__ import annotations
 from typing import List, Tuple
