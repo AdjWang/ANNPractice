@@ -5,3 +5,4 @@ dataset/*
 !dataset/*.py
 *.dump
 out/*
+*.so
