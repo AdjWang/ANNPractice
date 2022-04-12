@@ -6,7 +6,7 @@ import gzip
 from struct import unpack
 from random import randint
 
-from dataset import MINST
+from dataset import MNIST
 from matrix import Matrix
 from nnlayer import FullConnection, Model, Sigmoid, softmax, argmax, onehot
 
@@ -140,12 +140,12 @@ if __name__ == '__main__':
     input_nodes = 28 * 28
     hidden_nodes = 28 * 28
     output_nodes = 10
-    iter_num = 10
+    iter_num = 3
     learning_rate = 0.3
 
     # load data
     print('verify dataset')
-    MINST.verify(dataset_path)
+    MNIST.verify(dataset_path)
 
     print('load data')
     train_images = DataLoader.load_train_image(

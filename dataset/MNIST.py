@@ -28,13 +28,13 @@ def download_all(output_path, dataset=dataset):
             f.write(content)
 
 
-def verify(minst_path):
-    if not path.exists(minst_path):
-        mkdir(minst_path)
-        download_all(minst_path)
+def verify(mnist_path):
+    if not path.exists(mnist_path):
+        mkdir(mnist_path)
+        download_all(mnist_path)
     else:
-        pathes = [(i, path.join(minst_path, i)) for i in dataset]
+        pathes = [(i, path.join(mnist_path, i)) for i in dataset]
         to_download = [file for file, filepath in pathes
                        if not path.exists(filepath)]
         if len(to_download) > 0:
-            download_all(minst_path, to_download)
+            download_all(mnist_path, to_download)
