@@ -5,45 +5,8 @@ from __future__ import annotations
 from typing import List, Tuple
 import pprint
 
-from .interface import Matrix
 
-
-class Verifier:
-    """ Verify the matrix before do some operations. """
-    @staticmethod
-    def instance(mat):
-        if not isinstance(mat, PyMatrix):
-            raise Exception(f"invlid matrix instance type: {type(mat)}")
-
-    @staticmethod
-    def min_dim(mat):
-        row, column = mat.shape
-        if row == 0:
-            raise Exception(f"invalid row: {row}")
-        if column == 0:
-            raise Exception(f"invalid column: {column}")
-
-    @staticmethod
-    def identical_shape(mat1, mat2):
-        if mat1.shape != mat2.shape:
-            raise Exception(
-                f"matrix shape mismatch, mat1: {mat1.shape}, mat2: {mat2.shape}")
-
-    @staticmethod
-    def square(mat: PyMatrix):
-        if mat.shape[0] != mat.shape[1]:
-            raise Exception(f"not square: {mat.shape}")
-
-    @staticmethod
-    def dot_dim(mat1, mat2):
-        _, column1 = mat1.shape
-        row2, _ = mat2.shape
-        if column1 != row2:
-            raise Exception(
-                f"matrix dot shape mismatch, mat1: {mat1.shape}, mat2: {mat2.shape}")
-
-
-class PyMatrix(Matrix):
+class PyMatrix:
     """ Implement matrix and support some basic operations. """
     @staticmethod
     def zeros(row: int, column: int) -> PyMatrix:
@@ -53,43 +16,12 @@ class PyMatrix(Matrix):
             data.append([0.0]*column)
         return PyMatrix(data)
 
-    @staticmethod
-    def by_const(row: int, column: int, val: float) -> PyMatrix:
-        data = []
-        for _ in range(row):
-            data.append([val]*column)
-        return PyMatrix(data)
-
-    @staticmethod
-    def by_generator(row: int, column: int, val_generator: function) -> PyMatrix:
-        data = []
-        for _ in range(row):
-            data.append([val_generator() for _ in range(column)])
-        return PyMatrix(data)
-
-    @staticmethod
-    def by_list(data: List[List[float]]) -> PyMatrix:
-        return PyMatrix(data)
-
-    @staticmethod
-    def by_diag(data: List[float]) -> PyMatrix:
-        result = []
-        for _ in range(len(data)):
-            result.append([0]*len(data))
-
-        for idx, i in enumerate(data):
-            result[idx][idx] = i
-        return PyMatrix(result)
-
     def __init__(self, data: List[List[float]]) -> None:
         # init data
         self.__data = data
         # matrix properties
         self.__row = len(data)
         self.__column = len(data[0]) if len(data) > 0 else 0
-
-        # verify args
-        Verifier.min_dim(self)
 
     @property
     def shape(self) -> Tuple[int, int]:
@@ -133,10 +65,6 @@ class PyMatrix(Matrix):
             raise Exception("use subscript index as [1] or [1, 2]")
 
     def __add__(self, matrix: PyMatrix) -> PyMatrix:
-        # verify
-        Verifier.instance(matrix)
-        Verifier.identical_shape(self, matrix)
-
         new_data = list(map(list, self.__data))  # make a copy
         # point wise add
         for r in range(self.__row):
@@ -146,10 +74,6 @@ class PyMatrix(Matrix):
         return PyMatrix(new_data)
 
     def __sub__(self, matrix: PyMatrix) -> PyMatrix:
-        # verify
-        Verifier.instance(matrix)
-        Verifier.identical_shape(self, matrix)
-
         new_data = list(map(list, self.__data))  # make a copy
         # point wise substract
         for r in range(self.__row):
@@ -159,10 +83,6 @@ class PyMatrix(Matrix):
         return PyMatrix(new_data)
 
     def __mul__(self, matrix: PyMatrix) -> PyMatrix:
-        # verify
-        Verifier.instance(matrix)
-        Verifier.identical_shape(self, matrix)
-
         new_data = list(map(list, self.__data))  # make a copy
         # point wise substract
         for r in range(self.__row):
@@ -202,11 +122,6 @@ class PyMatrix(Matrix):
     @staticmethod
     def dot(mat1: PyMatrix, mat2: PyMatrix) -> PyMatrix:
         """ Calculate dot product of 2 matrices. """
-        # verify
-        Verifier.instance(mat1)
-        Verifier.instance(mat2)
-        Verifier.dot_dim(mat1, mat2)
-
         row1, _ = mat1.shape
         _, column2 = mat2.shape
         result = PyMatrix.zeros(row1, column2)
@@ -218,9 +133,6 @@ class PyMatrix(Matrix):
 
     @staticmethod
     def mul(mat: PyMatrix, val: float | int) -> PyMatrix:
-        # verify
-        Verifier.instance(mat)
-
         row, column = mat.shape
         result = PyMatrix.zeros(row, column)
         for r in range(row):

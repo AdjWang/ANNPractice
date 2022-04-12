@@ -1,3 +1,3 @@
 """ Implement all functional features about matrix. """
-from .PyMatrix import PyMatrix as Matrix
+from .interface import Matrix
 # __all__ = ['interface']
