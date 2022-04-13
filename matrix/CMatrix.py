@@ -20,14 +20,13 @@ class CMatrix(Structure):
 
     def __init__(self, data: List[Tuple[float]]) -> None:
         self.row = len(data)
-        self.column = len(data[0])
+        self.column = len(data[0]) if len(data) > 0 else 0
 
         data = CMatrix.__sublist_as_tuple(data)
 
         cdata2d = (c_double*self.column*self.row)(*data)
         LP_C_DOUBLE = POINTER(c_double)
         self.data = (LP_C_DOUBLE*self.row)(*cdata2d)
-        pass
 
     def to_list(self):
         pydata2d = []
@@ -141,26 +140,3 @@ class CMatrix(Structure):
         ret = CMatrix.zeros(mat.row, mat.column)
         libcmatrix.cmat_mul_val(byref(mat), c_double(val), byref(ret))
         return ret
-
-# test CMatrix
-if __name__ == '__main__':
-
-    mat1 = CMatrix([[10, 2.0], [3.0, 4.0], [5.0, 6.0]])
-    mat2 = CMatrix([(10, 2.0), (3.0, 4.0), (5.0, 6.0)])
-    mat3 = CMatrix([(10, 2.0), (3.0, 4.0), (5.0, 6.0)])
-    libcmatrix.cmat_add(byref(mat1), byref(mat2), byref(mat3))
-    # ret = pointer(new_mat)
-    # print(ret.row, ret.data)
-
-    print(mat3.to_list())
-
-    mat4 = CMatrix([(1.0, 2.0, 3.0), (4.0, 5.0, 6.0)])
-    libcmatrix.cmat_transpose(byref(mat3), byref(mat4))
-    print(mat4.to_list())
-
-    mat5 = CMatrix([(1, 0, -1), (2, 2, 3), (0, 1, -5)])
-    mat6 = CMatrix([(2, 1, 4), (0, 2, 0), (0, 3, 1)])
-    mat7 = CMatrix([(2, 1, 4), (0, 2, 0), (0, 3, 1)])
-    libcmatrix.cmat_dot(byref(mat5), byref(mat6), byref(mat7))
-    # [[2, -2, 3], [4, 15, 11], [0, -13, -5]]
-    print(mat7.to_list())

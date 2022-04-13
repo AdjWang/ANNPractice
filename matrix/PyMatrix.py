@@ -140,4 +140,3 @@ class PyMatrix:
                 result[r][c] = mat[r][c] * val
 
         return result
-

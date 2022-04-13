@@ -4,14 +4,26 @@ from typing import List, Tuple
 # from .PyMatrix import PyMatrix as MatrixImpl
 from .CMatrix import CMatrix as MatrixImpl
 
+ENABLE_VERIFIER = True
+
+def verifier_wrapper(vfunc):
+    if ENABLE_VERIFIER:
+        return vfunc
+    else:
+        def _empty(*args, **kwargs):
+            pass
+        return _empty
+
 
 class Verifier:
     """ Verify the matrix before do some operations. """
+    @verifier_wrapper
     @staticmethod
     def instance(mat):
         if not isinstance(mat, Matrix):
             raise Exception(f"invlid matrix instance type: {type(mat)}")
 
+    @verifier_wrapper
     @staticmethod
     def min_dim(mat):
         row, column = mat.shape
@@ -20,17 +32,20 @@ class Verifier:
         if column == 0:
             raise Exception(f"invalid column: {column}")
 
+    @verifier_wrapper
     @staticmethod
     def identical_shape(mat1, mat2):
         if mat1.shape != mat2.shape:
             raise Exception(
                 f"matrix shape mismatch, mat1: {mat1.shape}, mat2: {mat2.shape}")
 
+    @verifier_wrapper
     @staticmethod
     def square(mat: MatrixImpl):
         if mat.shape[0] != mat.shape[1]:
             raise Exception(f"not square: {mat.shape}")
 
+    @verifier_wrapper
     @staticmethod
     def dot_dim(mat1, mat2):
         _, column1 = mat1.shape
@@ -185,3 +200,11 @@ class Matrix:
         Verifier.instance(mat)
 
         return Matrix(MatrixImpl.mul(mat._mat_impl, val))
+
+    # for pickle
+    def __getstate__(self):
+        return self.to_list()
+
+    # for pickle
+    def __setstate__(self, data):
+        self._mat_impl = MatrixImpl(data)
