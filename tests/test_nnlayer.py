@@ -6,5 +6,5 @@ def test_fc():
     print(fc_layer)
 
 def test_softmax():
-    mat = Matrix.by_list([[0.6, -0.7]]).T
+    mat = Matrix.from_list([[0.6, -0.7]]).T
     print(softmax(mat))

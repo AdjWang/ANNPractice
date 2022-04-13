@@ -23,8 +23,8 @@ class FullConnection(NNFunction):
         # cache
         self.x = None
         # internal parameters
-        self.W = Matrix.by_generator(output_channel, input_channel, rand_param)
-        self.b = Matrix.by_generator(output_channel, 1, rand_param)
+        self.W = Matrix.from_generator(output_channel, input_channel, rand_param)
+        self.b = Matrix.from_generator(output_channel, 1, rand_param)
 
     def __repr__(self) -> str:
         return "Ti: " + str(self.input_channel)

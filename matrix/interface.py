@@ -1,14 +1,15 @@
 from __future__ import annotations
 from typing import List, Tuple
 
-from .PyMatrix import PyMatrix as MatrixImpl
+# from .PyMatrix import PyMatrix as MatrixImpl
+from .CMatrix import CMatrix as MatrixImpl
 
 
 class Verifier:
     """ Verify the matrix before do some operations. """
     @staticmethod
     def instance(mat):
-        if not isinstance(mat, MatrixImpl):
+        if not isinstance(mat, Matrix):
             raise Exception(f"invlid matrix instance type: {type(mat)}")
 
     @staticmethod
@@ -41,116 +42,146 @@ class Verifier:
 
 class Matrix:
     @staticmethod
-    def zeros(row: int, column: int) -> MatrixImpl:
+    def zeros(row: int, column: int) -> Matrix:
         """ new zeros matrix """
         data = []
         for _ in range(row):
             data.append([0.0]*column)
-        return MatrixImpl(data)
+        return Matrix(MatrixImpl(data))
 
     @staticmethod
-    def by_const(row: int, column: int, val: float) -> MatrixImpl:
+    def from_const(row: int, column: int, val: float) -> Matrix:
         data = []
         for _ in range(row):
             data.append([val]*column)
-        return MatrixImpl(data)
+        return Matrix(MatrixImpl(data))
 
     @staticmethod
-    def by_generator(row: int, column: int, val_generator: function) -> MatrixImpl:
+    def from_generator(row: int, column: int, val_generator: function) -> Matrix:
         data = []
         for _ in range(row):
             data.append([val_generator() for _ in range(column)])
-        return MatrixImpl(data)
+        return Matrix(MatrixImpl(data))
 
     @staticmethod
-    def by_list(data: List[List[float]]) -> MatrixImpl:
-        return MatrixImpl(data)
+    def from_list(data: List[List[float]]) -> Matrix:
+        return Matrix(MatrixImpl(data))
 
     @staticmethod
-    def by_diag(data: List[float]) -> MatrixImpl:
+    def from_diag(data: List[float]) -> Matrix:
         result = []
         for _ in range(len(data)):
             result.append([0]*len(data))
 
         for idx, i in enumerate(data):
             result[idx][idx] = i
-        return MatrixImpl(result)
+        return Matrix(MatrixImpl(result))
 
     """ Implement matrix and support some basic operations. """
-    def __init__(self, data: List[List[float]]) -> None:
-        self.__mat_impl = MatrixImpl(data)
+    def __init__(self, mat_impl: MatrixImpl) -> None:
+        self._mat_impl = mat_impl
 
         # verify args
         Verifier.min_dim(self)
 
+    def to_list(self) -> List[List[float]]:
+        return self._mat_impl.to_list()
+
     @property
     def shape(self) -> Tuple[int, int]:
-        return self.__mat_impl.shape
+        return self._mat_impl.shape
 
     @property
-    def T(self) -> MatrixImpl:
-        return self.__mat_impl.T
+    def T(self) -> Matrix:
+        return Matrix(self._mat_impl.T)
 
     def __repr__(self) -> str:
-        return self.__mat_impl.__repr__()
+        return self._mat_impl.__repr__()
 
     def __getitem__(self, index: tuple | int) -> List[float] | float:
-        return self.__mat_impl.__getitem__(index)
+        if isinstance(index, int):
+            # get a row
+            return self._mat_impl.__getitem__(index)
+            # TODO: implement getting a column
+        elif isinstance(index, tuple):
+            # get a number
+            if len(index) != 2:
+                raise Exception(f"index length must <= 2, now: {index}")
+            return self._mat_impl.__getitem__(index)
+        else:
+            raise Exception(f"use subscript as [1] or [1, 2], now: {index}")
 
     def __setitem__(self, index: tuple | int, val: float | List[float]) -> None:
-        self.__mat_impl.__setitem__(index, val)
+        row, column = self.shape
+        if isinstance(index, int) and isinstance(val, (tuple, list)):
+            # set a row
+            assert len(val) == column,\
+                f"column num mismatch, expect: {column}, input: {len(val)}"
+            assert index < row,\
+                f"index out of range: [0, {row})"
+            self._mat_impl.__setitem__(index, val)
+        elif isinstance(index, tuple) and isinstance(val, (float, int)):
+            # set a number
+            if len(index) != 2:
+                raise Exception(f"index length must <= 2, now: {index}")
+            if index[0]*column + index[1] >= row * column:
+                raise Exception(f"index out of range: {index}, max: {(row, column)}")
+            self._mat_impl.__setitem__(index, val)
+        else:
+            raise Exception(f"use subscript as [1] or [1, 2], val as float or int, now: {index}, {type(val)}")
 
-    def __add__(self, matrix: MatrixImpl) -> MatrixImpl:
+    def __add__(self, matrix: Matrix) -> Matrix:
         # verify
         Verifier.instance(matrix)
         Verifier.identical_shape(self, matrix)
 
-        return self.__mat_impl.__add__(matrix)
+        return Matrix(self._mat_impl.__add__(matrix._mat_impl))
 
-    def __sub__(self, matrix: MatrixImpl) -> MatrixImpl:
+    def __sub__(self, matrix: Matrix) -> Matrix:
         # verify
         Verifier.instance(matrix)
         Verifier.identical_shape(self, matrix)
 
-        return self.__mat_impl.__sub__(matrix)
+        return Matrix(self._mat_impl.__sub__(matrix._mat_impl))
 
-    def __mul__(self, matrix: MatrixImpl) -> MatrixImpl:
+    def __mul__(self, matrix: Matrix) -> Matrix:
         # verify
         Verifier.instance(matrix)
         Verifier.identical_shape(self, matrix)
 
-        return self.__mat_impl.__mul__(matrix)
+        return Matrix(self._mat_impl.__mul__(matrix._mat_impl))
 
     def rows(self) -> List[float]:
-        return self.__mat_impl.rows()
+        for row in self._mat_impl.rows():
+            yield row
 
     def columns(self) -> List[float]:
-        return self.__mat_impl.columns()
+        for column in self._mat_impl.columns():
+            yield column
 
     def sum(self, key=lambda x: x) -> float:
-        return self.__mat_impl.sum(key)
+        return self._mat_impl.sum(key)
 
     def __iter__(self) -> float:
-        return self.__mat_impl.__iter__()
+        for num in self._mat_impl:
+            yield num
 
-    def apply(self, operate: function) -> MatrixImpl:
-        return self.__mat_impl.apply(operate)
+    def apply(self, operate: function) -> Matrix:
+        return Matrix(self._mat_impl.apply(operate))
 
     @staticmethod
-    def dot(mat1: MatrixImpl, mat2: MatrixImpl) -> MatrixImpl:
+    def dot(mat1: Matrix, mat2: Matrix) -> Matrix:
         """ Calculate dot product of 2 matrices. """
         # verify
         Verifier.instance(mat1)
         Verifier.instance(mat2)
         Verifier.dot_dim(mat1, mat2)
 
-        return MatrixImpl.dot(mat1, mat2)
+        return Matrix(MatrixImpl.dot(mat1._mat_impl, mat2._mat_impl))
 
     @staticmethod
-    def mul(mat: MatrixImpl, val: float | int) -> MatrixImpl:
+    def mul(mat: Matrix, val: float | int) -> Matrix:
         # verify
         Verifier.instance(mat)
 
-        return MatrixImpl.dot(mat, val)
-
-
+        return Matrix(MatrixImpl.mul(mat._mat_impl, val))

@@ -33,7 +33,6 @@ void cmat_destructor(CMatrix* cmat_this) {
 */
 
 void print(const CMatrix* mat) {
-    // printf("%d, %d, %p\n", t->a, t->b, t->data);
     printf("row: %d, column: %d\n", mat->row, mat->column);
     for(int i=0; i<mat->row; i++){
         for(int j=0; j<mat->column; j++){
@@ -73,12 +72,19 @@ void cmat_mul_val(const CMatrix* mat, double val, CMatrix* out){
     });
 }
 
-double cmat_sum(const CMatrix* mat){
+// neet to set restype in python: libcmatrix.cmat_sum.restype = c_double
+double cmat_sum(const CMatrix* mat, double (*key)(const double)){
     double sum = 0.0;
     FOR_EACH(mat, {
-        sum += mat->data[r][c];
+        sum += key(mat->data[r][c]);
     });
     return sum;
+}
+
+void cmat_apply(const CMatrix* mat, CMatrix* out, double (*func)(const double)){
+    FOR_EACH(mat, {
+        out->data[r][c] = func(mat->data[r][c]);
+    });
 }
 
 void cmat_dot(const CMatrix* mat1, const CMatrix* mat2, CMatrix* out){

@@ -8,20 +8,15 @@ import pprint
 
 class PyMatrix:
     """ Implement matrix and support some basic operations. """
-    @staticmethod
-    def zeros(row: int, column: int) -> PyMatrix:
-        """ new zeros matrix """
-        data = []
-        for _ in range(row):
-            data.append([0.0]*column)
-        return PyMatrix(data)
-
     def __init__(self, data: List[List[float]]) -> None:
         # init data
         self.__data = data
         # matrix properties
         self.__row = len(data)
         self.__column = len(data[0]) if len(data) > 0 else 0
+
+    def to_list(self) -> List[List[float]]:
+        return self.__data
 
     @property
     def shape(self) -> Tuple[int, int]:
@@ -36,33 +31,30 @@ class PyMatrix:
         return pprint.saferepr(self.__data)
 
     def __getitem__(self, index: tuple | int) -> List[float] | float:
+        # more safty checking at interface.py.Matrix()
         if isinstance(index, int):
             # get a row
             return self.__data[index]
             # TODO: implement getting a column
         elif isinstance(index, tuple):
             # get a number
-            if len(tuple) != 2:
-                raise Exception("index length must <= 2")
+            if len(index) != 2:
+                raise Exception(f"index length must <= 2, now: {index}")
             return self.__data[index[0]][index[1]]
         else:
-            raise Exception("use subscript as [1] or [1, 2]")
+            raise Exception(f"use subscript as [1] or [1, 2], now: {index}")
 
     def __setitem__(self, index: tuple | int, val: float | List[float]) -> None:
-        if isinstance(index, int) and isinstance(val, list):
+        # more safty checking at interface.py.Matrix()
+        if isinstance(index, int) and isinstance(val, (tuple, list)):
             # set a row
-            if len(val) != self.columns:
-                raise Exception(
-                    f"column num mismatch, expect: {self.columns}, input: {len(val)}")
             self.__data[index] = val
             # TODO: implement setting columns
-        elif isinstance(index, tuple) and isinstance(val, float):
+        elif isinstance(index, tuple) and isinstance(val, (float, int)):
             # set a number
-            if len(tuple) != 2:
-                raise Exception("index length must <= 2")
             self.__data[index[0]][index[1]] = val
         else:
-            raise Exception("use subscript index as [1] or [1, 2]")
+            raise Exception(f"use subscript as [1] or [1, 2], val as float or int, now: {index}, {type(val)}")
 
     def __add__(self, matrix: PyMatrix) -> PyMatrix:
         new_data = list(map(list, self.__data))  # make a copy
@@ -118,6 +110,14 @@ class PyMatrix:
             for c in range(column):
                 new_data[r][c] = operate(self.__data[r][c])
         return PyMatrix(new_data)
+
+    @staticmethod
+    def zeros(row: int, column: int) -> PyMatrix:
+        """ new zeros matrix """
+        data = []
+        for _ in range(row):
+            data.append([0.0]*column)
+        return PyMatrix(data)
 
     @staticmethod
     def dot(mat1: PyMatrix, mat2: PyMatrix) -> PyMatrix:

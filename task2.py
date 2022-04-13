@@ -81,10 +81,10 @@ def train_step(model: Model, x, y):
     training_data = list(zip(x, y))
     loss = 0.0
     for idx, (x, ground_truth) in enumerate(training_data, 1):
-        predict = model.forward(Matrix.by_list([x]).T)
+        predict = model.forward(Matrix.from_list([x]).T)
         probability = softmax(predict)
 
-        ground_truth = Matrix.by_list([ground_truth]).T
+        ground_truth = Matrix.from_list([ground_truth]).T
         # loss
         step_loss = (probability * ground_truth)\
             .sum(key=lambda x: -log(x) if x > 0.0 else 0.0)
@@ -104,9 +104,9 @@ def validate(model: Model, x, y):
 
     loss = 0.0
     for idx, (x, ground_truth) in enumerate(validate_data, 1):
-        predict = model.forward(Matrix.by_list([x]).T)
+        predict = model.forward(Matrix.from_list([x]).T)
         probability = softmax(predict)
-        ground_truth = Matrix.by_list([ground_truth]).T
+        ground_truth = Matrix.from_list([ground_truth]).T
         # loss
         step_loss = (probability * ground_truth)\
             .sum(key=lambda x: -log(x) if x > 0.0 else 0.0)
@@ -130,7 +130,7 @@ def train(model: Model, train_x, train_y, validate_x, validate_y, iter_num=100, 
 
 
 def predict(model, x):
-    probability = softmax(model.forward(Matrix.by_list([x]).T)).T[0]
+    probability = softmax(model.forward(Matrix.from_list([x]).T)).T[0]
     return argmax(probability)
 
 

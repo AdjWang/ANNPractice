@@ -13,10 +13,10 @@ def train(model: Model, x, y, iter_num=100):
     for i in range(1, iter_num+1):
         loss = 0.0
         for x, ground_truth in training_data:
-            predict = model.forward(Matrix.by_list([x]).T)
+            predict = model.forward(Matrix.from_list([x]).T)
             predict_list.append(predict)
             # print(predict)
-            ground_truth = Matrix.by_list([ground_truth]).T
+            ground_truth = Matrix.from_list([ground_truth]).T
             # loss
             step_loss = ((predict - ground_truth) *
                          (predict - ground_truth)).sum()
@@ -32,7 +32,7 @@ def train(model: Model, x, y, iter_num=100):
 
 
 def predict(model, x):
-    return model.forward(Matrix.by_list([x]).T).T[0]
+    return model.forward(Matrix.from_list([x]).T).T[0]
 
 
 def target_func(x, a, b, c, d):

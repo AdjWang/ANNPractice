@@ -16,7 +16,7 @@ def gradient_descent(W: Matrix, diff_W: Matrix, learning_rate: float) -> Matrix:
 def softmax(x: Matrix) -> Matrix:
     assert x.shape[1] == 1
     summary = sum([pow(e, yi) for yi in x.T[0]])
-    return Matrix.by_list([[pow(e, yi)/summary for yi in x.T[0]]]).T
+    return Matrix.from_list([[pow(e, yi)/summary for yi in x.T[0]]]).T
 
 
 def onehot(type_num: int) -> List[List[int]]:

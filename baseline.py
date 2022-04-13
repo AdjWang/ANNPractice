@@ -20,9 +20,9 @@ def train(layers, datas, iter_num=1000):
         print(f'iter: {i}')
         loss = 0.0
         for data, ground_truth in datas:
-            predict = forward(layers, Matrix.by_list([data]).T)
+            predict = forward(layers, Matrix.from_list([data]).T)
             print(predict)
-            ground_truth = Matrix.by_list([ground_truth]).T
+            ground_truth = Matrix.from_list([ground_truth]).T
             # loss
             loss += ((predict - ground_truth)*(predict - ground_truth)).sum()
             # diff of loss
