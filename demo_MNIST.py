@@ -140,7 +140,7 @@ if __name__ == '__main__':
     input_nodes = 28 * 28
     hidden_nodes = 28 * 28
     output_nodes = 10
-    iter_num = 3
+    iter_num = 20
     learning_rate = 0.3
 
     # load data

@@ -6,3 +6,4 @@ dataset/*
 *.dump
 out/*
 *.so
+*.svg
