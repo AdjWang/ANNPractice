@@ -1,4 +1,4 @@
-from os import path
+from os import path, mkdir
 import sys
 import random
 from math import sin, cos, pi, log
@@ -177,6 +177,8 @@ if __name__ == '__main__':
 
     # train
     print('train')
+    if not path.exists('./out'):
+        mkdir('./out')
     loss_list = train(model, train_images, train_labels,
                       validate_images, validate_labels, iter_num, './out')
     print(loss_list)
